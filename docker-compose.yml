@@ -1,0 +1,78 @@
+# docker-compose.yml — SADECE LOKAL EĞİTİM. HİÇBİR AĞA AÇMA.
+# VulnWeb — OWASP Top 10:2025 eğitim amaçlı zafiyetli web uygulaması.
+name: vulnweb
+
+services:
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    image: vulnweb/app:local
+    container_name: vulnweb-app
+    # SADECE loopback. Asla "8088:80" (0.0.0.0) yazma.
+    ports:
+      - "127.0.0.1:8088:80"
+    environment:
+      DB_HOST: db
+      DB_NAME: vulndb
+      DB_USER: vulnuser
+      DB_PASSWORD: vulnpass
+      LAB_INSECURE: "1"
+      ENABLE_DANGEROUS: "0"        # RCE/SSRF-internal/file-write labları opt-in
+      ALLOW_PUBLIC_EXPOSURE: "0"   # loopback dışı bind tespitinde başlamayı reddet
+    volumes:
+      - ./app/src:/var/www/html:rw # SADECE app source. Hassas host path mount etme.
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [vulnnet]
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 512m
+    pids_limit: 256
+    restart: unless-stopped
+
+  db:
+    image: mariadb:11.8
+    container_name: vulnweb-db
+    # Host portu YOK -> sadece in-cluster "db:3306".
+    # Doğrudan DB erişimi istersen (3307 dolu olduğu için 3308 kullan):
+    #   ports: ["127.0.0.1:3308:3306"]
+    environment:
+      MARIADB_ROOT_PASSWORD: rootpass
+      MARIADB_DATABASE: vulndb
+      MARIADB_USER: vulnuser
+      MARIADB_PASSWORD: vulnpass
+    volumes:
+      - dbdata:/var/lib/mysql
+      - ./db/init:/docker-entrypoint-initdb.d:ro   # ilk boot'ta *.sql sırayla çalışır
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 30s
+      start_interval: 5s
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    networks: [vulnnet]
+    restart: unless-stopped
+
+  # OPSİYONEL: eğitmen DB UI (loopback). 8081 dolu -> 8089.
+  adminer:
+    image: adminer:5
+    container_name: vulnweb-adminer
+    ports:
+      - "127.0.0.1:8089:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [vulnnet]
+    restart: unless-stopped
+
+networks:
+  vulnnet:
+    driver: bridge
+
+volumes:
+  dbdata:

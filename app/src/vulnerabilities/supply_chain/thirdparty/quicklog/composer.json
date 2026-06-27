@@ -1,0 +1,8 @@
+{
+  "name": "quicklog/quicklog",
+  "description": "Hizli ve basit loglama kutuphanesi (SAHTE — egitim amacli, backdoor'lu)",
+  "version": "2.1.3",
+  "license": "MIT",
+  "authors": [{ "name": "definitely-not-malicious", "email": "maintainer@example.com" }],
+  "_note": "Bu surum (2.1.3) kotu niyetli bir maintainer tarafindan backdoor'landi. SCA araclari bunu CVE-2026-99999 olarak isaretler. Tedarik zinciri saldirisi ornegi (event-stream/xz tarzi)."
+}

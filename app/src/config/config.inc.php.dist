@@ -1,0 +1,24 @@
+<?php
+/**
+ * config.inc.php.dist — şablon. Kopyala: cp config.inc.php.dist config.inc.php
+ * Gerçek config.inc.php normalde .gitignore'dadır. Tüm değerler env'den okunur.
+ * SADECE EĞİTİM — buradaki "secret"ler sahtedir.
+ */
+return [
+    'db' => [
+        'host' => getenv('DB_HOST') ?: 'db',
+        'name' => getenv('DB_NAME') ?: 'vulndb',
+        'user' => getenv('DB_USER') ?: 'vulnuser',
+        'pass' => getenv('DB_PASSWORD') ?: 'vulnpass',
+    ],
+    // Varsayılan güvenlik seviyesi
+    'default_security' => 'low',
+    // CTF flag türetme anahtarı (sahte)
+    'ctf_key' => getenv('CTF_KEY') ?: 'vulnweb-local-ctf-key',
+    // Tehlikeli labları (RCE/SSRF-internal/file-write) açar
+    'enable_dangerous' => getenv('ENABLE_DANGEROUS') === '1',
+    // Loopback dışı bind/public IP'de başlamayı reddetme guardrail'i devre dışı bırakır
+    'allow_public_exposure' => getenv('ALLOW_PUBLIC_EXPOSURE') === '1',
+    // Exploit log paneli
+    'enable_logging' => true,
+];

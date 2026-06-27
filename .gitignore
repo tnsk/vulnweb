@@ -1,0 +1,20 @@
+# Yüklenen dosyalar (lab çıktısı) — dizini koru, içeriği yoksay
+app/src/hackable/uploads/*
+!app/src/hackable/uploads/.gitkeep
+
+# Loglar
+app/src/logs/*
+logs/
+*.log
+
+# Gerçek config (üretimde) — bu lab'da config.inc.php repo'da bırakıldı (sahte secret)
+# config/config.inc.php
+
+# PHP bağımlılıkları
+vendor/
+composer.lock
+
+# Docker/OS
+.DS_Store
+*.swp
+dbdata/
